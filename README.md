@@ -2,6 +2,8 @@
 
 照菜谱做饭总像抽盲盒？这一集把做菜当工程来拆：菜谱背后其实只有三件事。**纤维多长**（横切牛羊顺切猪）、**水和锅温**（沥干、烧透锅、出锅前放盐）、**谁先下锅**（下锅时间表）。最后用一道辣椒炒肉把三件事串起来。帕秋莉讲课，红美铃掌勺，琪露诺负责把锅冻住。约 4 分 30 秒，黑板粉笔风（沿用第 5 集）。
 
+BGM 是红美铃的角色曲「明治十七年の上海アリス」（东方红魔乡，ZUN）的八音盒改编：`tools/bgm.mjs` 从 ZUN 原版 MIDI 扒谱取音符，生成 `src/bgm-data.js`，再由 `core.js` 的 `score()` 编配。
+
 内容整理自龙海的长文《人人都是大厨：告别"抽盲盒"式下厨，讲透 22 条做菜的基本原理》，只讲烹饪技巧。台词和取舍见 [docs/方案.md](docs/方案.md)，分镜见 [docs/分镜.md](docs/分镜.md)。
 
 ```sh
@@ -70,7 +72,7 @@ site/                 介绍网页（单栏极简）和它用的短视频、帧�
 src/props.js          共用站位和道具
 src/scenes/           每段一个文件（现在是五段演示）
 src/film.js           时间线、字幕、翻页转场
-src/bgm-data.js       背景音乐的音符（tools/bgm.mjs 从角色曲扒谱里取，core.js 的 score() 编配；现在是帕秋莉的「ラクトガール ～ 少女密室」）
+src/bgm-data.js       背景音乐的音符（tools/bgm.mjs 从角色曲扒谱里取，core.js 的 score() 编配；本集是红美铃的「明治十七年の上海アリス」）
 tools/                抽帧、穿模检查、打包、配音、出片
 docs/                 教程、经验、各类文档模板
 ```
@@ -80,5 +82,5 @@ docs/                 教程、经验、各类文档模板
 - 代码：MIT。
 - 字体：霞鹜文楷（SIL Open Font License，`fonts/LXGWWenKai-OFL.txt`）。`npm run font` 会下载，不进仓库。
 - 语音：AquesTalk（© 株式会社アクエスト），经 [aquestalk.js](https://github.com/y52en/aquestalk.js) 合成；仓库里只有合成出的声音，不含 AquesTalk 本体。发布成片请在片尾或简介注明「AquesTalk（株式会社アクエスト）」。拼音→假名表来自 [yukumo-js](https://github.com/yukumo-group/yukumo-js)（MIT）。
-- 背景音乐：东方红魔乡「ラクトガール ～ 少女密室」（ZUN）的代码改编，音符取自 [touhou-midi-collection](https://github.com/AyHa1810/touhou-midi-collection) 里的 ZUN 原版 MIDI；仓库里只有挑出的音符和我们的编配，不含 MIDI 文件。
+- 背景音乐：东方红魔乡「明治十七年の上海アリス」（红美铃的角色曲，ZUN）的代码改编，音符取自 [touhou-midi-collection](https://github.com/AyHa1810/touhou-midi-collection) 里的 ZUN 原版 MIDI；仓库里只有挑出的音符和我们的编配，不含 MIDI 文件。
 - 东方 Project 的角色版权归上海爱丽丝幻乐团（ZUN）。使用本模板做的是同人作品，请遵守东方 Project 官方的二次创作指南。
