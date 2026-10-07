@@ -177,6 +177,7 @@ async function mixAudio(ac, out, t0, from, dur, { voice = true, bgm = true } = {
   // 最后过一个限幅器，AquesTalk 原声峰值就顶到 0 dB，叠上音乐容易爆音
   const lim = ac.createDynamicsCompressor(); lim.threshold.value = -4; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = .002; lim.release.value = .12; lim.connect(out); out = lim;
   if (bgm) { const g = ac.createGain(); g.gain.value = hasVoice ? .45 : 1; g.connect(out); score(ac, g, t0, from, from + dur); }
+  if (typeof sfxMix === 'function') sfxMix(ac, out, t0, from, dur);
   if (!hasVoice) return;
   const vg = ac.createGain(); vg.gain.value = .35; vg.connect(out);
   for (const s of FILM.T) for (const l of s.lines || []) {

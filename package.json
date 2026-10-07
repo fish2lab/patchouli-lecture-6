@@ -1,8 +1,8 @@
 {
-  "name": "touhou-code-video-template",
+  "name": "patchouli-lecture-6",
   "private": true,
   "version": "0.1.0",
-  "description": "纯代码做一集东方科普视频：Canvas 2D 剪纸风逐帧引擎 + 两个剪纸角色 + 油库里语音 + 出片工具链（模板仓库）",
+  "description": "帕秋莉讲座第 6 集：做菜不靠抽盲盒——菜谱背后的三件事（纯代码黑板风东方科普视频）",
   "scripts": {
     "font": "node tools/fetch-font.mjs",
     "dev": "node tools/frames.mjs --grid 24",
