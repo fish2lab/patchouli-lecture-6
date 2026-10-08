@@ -3,6 +3,7 @@
 #   再在 Settings → Secrets and variables → Actions → Variables 加 ENABLE_PAGES=true（私有仓库要付费计划才有 Pages）
 #   推 v* 标签，或提交信息里带 [release] → 另外逐帧渲染 1080p MP4，一起发到 Release
 #   （标签名取 package.json 的 version；由 CI 自己打标签，适合不能直接推标签的环境）
+#   在 Actions 页面手动运行（workflow_dispatch，可以选任意分支）→ 也出片并发 Release
 name: build & publish
 on:
   push:
@@ -20,7 +21,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      RELEASE: ${{ startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]') }}
+      RELEASE: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]') }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
