@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>封面</title>
+<style>
+@font-face { font-family: WenKai; src: url(fonts/LXGWWenKai-Regular.ttf); font-display: block; }
+html, body { margin: 0; background: #222; }
+canvas { display: block; }
+</style>
+</head>
+<body>
+<!-- 封面：?ar=169（1920×1080）或 ?ar=43（1440×1080）。tools/cover.mjs 导出 PNG 到 out/cover/。
+     画面（4:3 不放琪露诺和前台）：箱庭厨房（和正片同一间），后墙贴一张大订单纸写片名「心中有谱」；帕秋莉抱书站左边，美铃摆起手式站右边，琪露诺从前台后面冒头。
+     缩到 480 宽也要认得出片名。 -->
+<canvas id="c"></canvas>
+<script src="src/core.js"></script>
+<script src="src/kit.js"></script>
+<script src="src/lec/chalk.js"></script>
+<script src="src/lec/kitchen.js"></script>
+<script src="src/character/patchouli.js"></script>
+<script src="src/character/cirno.js"></script>
+<script src="src/rig.js"></script>
+<script src="src/character/ran.js"></script>
+<script src="src/character/meiling.js"></script>
+<script src="src/character/remilia.js"></script>
+<script src="src/character/yukari.js"></script>
+<script src="src/character/satori.js"></script>
+<script>
+const COV_AR = Q.get('ar') === '43' ? '43' : '169', CW = COV_AR === '43' ? 1440 : 1920, CH = 1080, cv = document.getElementById('c');
+cv.width = CW; cv.height = CH;
+const WIDE = COV_AR === '169', OX = WIDE ? 0 : 240;   // 4:3 取 1920 画面中间 1440
+// 版式：订单纸居中偏左上，人物在纸两侧（4:3 往里收）
+const L = WIDE
+  ? { tk: [560, 60, 800, 600], pch: 300, mei: 1660, cir: 1390, h: 540, title: 168, sub: 58, tag: 40, ch: 72 }
+  : { tk: [560, 60, 800, 600], pch: 420, mei: 1500, cir: 0, h: 520, title: 168, sub: 58, tag: 40, ch: 72 };
+const covT = (c, t, x, y, size, color, align = 'left', heavy = true) => zh(c, t, x, y, { size, color, align, outline: color, ow: heavy ? size * .07 : size * .04 });
+function covDraw(c) {
+  c.save(); c.translate(-OX, 0);
+  ktRoom(c, 3);
+  // 订单纸
+  const [x, y, w, h] = L.tk, cx = x + w / 2;
+  c.save(); c.translate(cx, y + h / 2); c.rotate(-.02); c.translate(-cx, -(y + h / 2));
+  cutPaper(c, rectPts(x, y, w, h, 12), CK.slate, { seed: 7001, step: 50, blur: 26, sx: 8, sy: 16, grain: .07 });
+  c.save(); c.beginPath(); c.rect(x, y, w, h); c.clip(); c.strokeStyle = 'rgba(80,140,200,.12)'; c.lineWidth = 2;
+  for (let yy = y + 70; yy < y + h; yy += 44) { c.beginPath(); c.moveTo(x, yy); c.lineTo(x + w, yy); c.stroke(); } c.restore();
+  for (const [tx, rot] of [[x + 50, -.35], [x + w - 50, .35]]) { c.save(); c.translate(tx, y + 6); c.rotate(rot); cutPaper(c, rectPts(-52, -16, 104, 32, 2), alpha('#ffd34d', .9), { seed: 7010 + tx, step: 10, blur: 3, sy: 2 }); c.restore(); }
+  // 字：信息行 → 片名 → 副标题 → 三件事
+  covT(c, '帕秋莉讲座 第 6 集', x + 56, y + 88, L.tag, CK.muted, 'left', false);
+  covT(c, '做菜原理', x + w - 56, y + 88, L.tag, CK.muted, 'right', false);
+  c.fillStyle = CK.ink; c.fillRect(x + 56, y + 112, w - 112, 4);
+  covT(c, '心中有谱', cx, y + 290, L.title, CK.yellow, 'center');
+  const uw = zhWidth(c, '心中有谱', L.title); c.fillStyle = CK.pink; c.fillRect(cx - uw / 2, y + 312, uw, 8);
+  covT(c, '做菜不再抽盲盒', cx, y + 400, L.sub, CK.ink, 'center');
+  const three = [['切', CK.pink], ['水', CK.blue], ['先后', CK.green]], gap = 56;
+  const tw = three.reduce((s, [t]) => s + zhWidth(c, t, L.ch) + 40, 0) + gap * 2; let ox = cx - tw / 2;
+  for (const [t, col] of three) { const ww = zhWidth(c, t, L.ch) + 40;
+    c.lineWidth = 6; c.strokeStyle = col; c.beginPath(); c.roundRect(ox, y + 450, ww, 104, 18); c.stroke();
+    covT(c, t, ox + ww / 2, y + 528, L.ch, col, 'center'); ox += ww + gap; }
+  c.restore();
+  // 人物
+  drawPatchouli(c, { x: L.pch, y: 1000, h: L.h, facing: 1, pose: 'point', gesture: .7, mood: 'smug', t: 1.2 });
+  drawMeiling(c, { x: L.mei, y: 1000, h: L.h, facing: -1, pose: 'kungfu', gesture: .9, mood: 'smile', t: 1.2 });
+  if (WIDE) {   // 4:3 地方不够，不放琪露诺和前台
+    c.save(); c.beginPath(); c.rect(0, 0, W, 860); c.clip();
+    drawCirno(c, { x: L.cir, y: 990, h: 500, facing: -1, pose: 'point', gesture: .4, mood: 'proud', t: 1.2 }); c.restore();
+    ktFront(c, 3);
+  }
+  c.restore();
+}
+document.fonts.load('40px WenKai', '心中有谱做菜不再抽盲盒帕秋莉讲座第6集原理切水先后').then(() => document.fonts.ready).then(() => { const c = cv.getContext('2d'); CLOCK0 = 0; covDraw(c); window.__ready = true; });
+</script>
+</body>
+</html>

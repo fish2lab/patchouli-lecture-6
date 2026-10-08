@@ -42,8 +42,8 @@ jobs:
         with:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || env.TAG }}
           target_commitish: ${{ github.sha }}
-          name: 模板演示 ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || env.TAG }}
-          prerelease: true
+          name: 帕秋莉讲座 第 6 集「心中有谱」 ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || env.TAG }}
+          prerelease: false
           body_path: docs/发布.md
           files: |
             patchouli-lecture-6.html

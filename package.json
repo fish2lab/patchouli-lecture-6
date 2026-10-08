@@ -1,7 +1,7 @@
 {
   "name": "patchouli-lecture-6",
   "private": true,
-  "version": "0.1.0",
+  "version": "6.0.0",
   "description": "帕秋莉讲座第 6 集：做菜不靠抽盲盒——菜谱背后的三件事（纯代码黑板风东方科普视频）",
   "scripts": {
     "font": "node tools/fetch-font.mjs",
