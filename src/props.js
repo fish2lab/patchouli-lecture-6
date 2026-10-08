@@ -5,8 +5,8 @@
 //   内容区（板坐标 = 屏幕坐标时）：x 500–1400，y 70–860；琪露诺冒头的地方 x > 1220 且 y > 540，她说话时那里不放东西。
 const OG = {
   pch: { x: 300, y: 880, h: 500 },
-  mei: { x: 1660, y: 880, h: 500, facing: -1 },
-  cir: { x: 1390, y: 1060, h: 500, facing: -1 },   // 脚底在画面外，只露上半身（第三版 Q 版头大，比原来低 50，蝴蝶结不碰板书）
+  mei: { x: 1700, y: 880, h: 500, facing: -1 },
+  cir: { x: 1395, y: 995, h: 500, facing: -1 },    // 站在右前方料理台后面，只露上半身
 };
 
 // ogPch / ogMei：标准站位的两人，嘴型、表情、眨眼自动从当前台词取。o 覆盖参数
@@ -21,10 +21,14 @@ function ogCirnoUp(tau, lines) {
   return k;
 }
 function ogCirno(c, tau, L, lines, o = {}) {
-  const k = ogCirnoUp(tau, lines); if (k <= .001) return 0;
-  c.save(); c.beginPath(); c.rect(0, 0, W, 892); c.clip();   // 地板线以下不画（她从黑板槽后面冒出来）
-  drawCirno(c, { ...OG.cir, y: OG.cir.y + (1 - k) * 420, pose: 'point', gesture: .4, mood: moodOf(L, 'cirno', 'normal'), mouth: mouthOf(L, 'cirno'), blink: blinkAt(tau, 2), t: tau, ...o });
-  c.restore(); return k;
+  const k = ogCirnoUp(tau, lines);
+  if (k > .001) {
+    c.save(); c.beginPath(); c.rect(0, 0, W, 860); c.clip();   // 她从右前方那张料理台后面冒出来
+    drawCirno(c, { ...OG.cir, y: OG.cir.y + (1 - k) * 420, pose: 'point', gesture: .4, mood: moodOf(L, 'cirno', 'normal'), mouth: mouthOf(L, 'cirno'), blink: blinkAt(tau, 2), t: tau, ...o });
+    c.restore();
+  }
+  ktFront(c, tau);   // 前景料理台每帧都画（各段最后都调用 ogCirno）
+  return k;
 }
 // ogOutro：段末用板擦把整块黑板擦干净（在 ckLayer 里调用；返回板擦位置，交给 ogEraser 画）。
 //   dur 段长；擦在段末前 1.25 秒到 0.25 秒之间，最后 0.25 秒是干净黑板（段间交接画面）。

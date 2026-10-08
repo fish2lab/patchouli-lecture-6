@@ -93,10 +93,10 @@ function s4Signals(lc, tau, wr) {
   wr('看食材', X + 950, 176, s4At(i, .12), { size: 62, color: 'yellow', heavy: true, align: 'center' });
   // (a) 肉片：粉 → 白
   const ta = s4At(i, .25), ua = sm(ta + .4, ta + 1.8, tau), pa = s4seg(tau, ta - .2, ta + .5);
-  if (pa > 0) { const col = mix(CK.pink, CK.ink, ua), cx = cxs[0];
+  if (pa > 0) { const col = mix(CK.pink, CK.cooked, ua), cx = cxs[0];
     ckShape(lc, rectPts(cx - 105, 340, 210, 108, 22), { color: col, w: 5, p: pa, seed: 4501, hatch: pa >= 1 ? col : false, gap: 18 });
     for (let k = 0; k < 3; k++) { const pts = []; for (let j = 0; j <= 10; j++) { const u = j / 10; pts.push([cx - 82 + 164 * u, 368 + k * 26 + 3 * Math.sin(u * 9 + k)]); }
-      ckLine(lc, pts, { color: mix(CK.pink, CK.ink, ua * .6), w: 3, smooth: true, p: s4seg(pa, .5, 1), seed: 4502 + k }); }
+      ckLine(lc, pts, { color: mix(CK.pink, CK.cooked, ua * .6), w: 3, smooth: true, p: s4seg(pa, .5, 1), seed: 4502 + k }); }
     if (ua > .05 && ua < .98) s4Steam(lc, cx, 320, tau, Math.sin(ua * Math.PI), 4505, 40, 'muted'); }
   wr('红', cxs[0] - 64, 600, ta + .3, { size: 44, color: 'pink' });
   if (tau > ta + .5) s4To(lc, cxs[0] - 12, 585, s4seg(tau, ta + .5, ta + .8), 4508, 'muted', 30);
@@ -220,7 +220,7 @@ function s4Draw(c, tau, L) {
       { const r = R[3], i = 4, t0 = s4T(i), y = r.y, pi = s4seg(tau, t0 + .1, t0 + .7);
         const tw = s4At(i, .1), tr = s4At(i, .45), tj = s4At(i, .8);
         if (pi > 0) { ogWok(lc, S4IX - 10, y - 8, .3, { p: pi, seed: 4470 });
-          const wcol = mix(CK.pink, CK.ink, sm(tw, tw + .8, tau));
+          const wcol = mix(CK.pink, CK.cooked, sm(tw, tw + .8, tau));
           for (let k = 0; k < 2; k++) s4Slice(lc, S4IX - 30 + k * 26, y + 2 - k * 3, 22, 10, wcol, 4471 + k, s4seg(pi, .5, 1)); }
         if (tau > tr) { const u = sm(tr, tr + .7, tau, easeIO);   // 小辣椒沿弧线落回锅
           ckArrow(lc, [S4IX - 92, y - 46], [S4IX - 22, y - 18], { color: 'green', w: 3.5, head: 10, bend: -14, p: s4seg(tau, tr, tr + .4), seed: 4474 });

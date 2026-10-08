@@ -113,7 +113,7 @@ function s3Draw(c, tau, L) {
     // ---- 4：肉 —— 粉 → 白的一条，再「盛出」 ----
     const tm = s3At(3, .05), gm = sm(s3At(3, .35), s3At(3, .72), tau, t => t);
     wr('肉', S3MEAT[0] - 12, S3RM + 12, tm, { size: 36, color: 'pink', align: 'right' });
-    s3Bar(lc, S3MEAT[0], S3MEAT[1], S3RM, gm, { color: 'pink', fill: ['pink', 'ink'], seed: 3381 });
+    s3Bar(lc, S3MEAT[0], S3MEAT[1], S3RM, gm, { color: 'pink', fill: ['pink', 'cooked'], seed: 3381 });
     const tu = s3At(3, .78), pu = s3P(tau, tu, .35);
     ckArrow(lc, [S3MEAT[1], S3RM - S3BH / 2 - 2], [S3MEAT[1], 266], { color: 'yellow', w: 5, head: 15, p: pu, seed: 3382 });
     wr('盛出', S3MEAT[1] + 14, 300, tu + .15, { size: 34, color: 'yellow' });

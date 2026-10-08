@@ -15,53 +15,34 @@
 
 // ===================== 颜色（V8 KIT.md 的 tokens） =====================
 const CK = {
-  slate: '#1e3329', slate2: '#24392f', frame: '#6b4a34', frame2: '#4f3524', wall: '#3a3440', wall2: '#2f2a35', floor: '#2a211c',
-  ink: '#f2efe6',      // 白粉笔：字和轮廓
-  muted: '#d6d2c4',    // 旧粉笔：次要注释（满不透明，不用透明度压低）
-  yellow: '#f6d96b',   // 唯一的强调：新出现的、重要的东西
-  blue: '#94cdea',     // 结构；本集也是「光」（470 nm 蓝光）
-  pink: '#f3a3ba',     // 问题、代价、失稳
-  green: '#aedb93',    // 解决、恢复
-  orange: '#f5b26b',   // 第五种章节色
+  // 第 6 集：箱庭厨房里挂的一张大订单纸（奶油色纸 + 马克笔），取代黑板。键名照旧，各段不用改。
+  slate: '#fffaf0', slate2: '#fff3dc', frame: '#ff8a4c', frame2: '#e86a2c', wall: '#ffe7b8', wall2: '#f6d49a', floor: '#f2d3a0',
+  ink: '#3a2b22',      // 深棕马克笔：字和轮廓
+  muted: '#8a7563',    // 浅一号：次要注释
+  yellow: '#e88a00',   // 唯一的强调（纸上黄色看不清，用琥珀色）
+  blue: '#2c7cc4',
+  pink: '#e0457a',
+  green: '#3a9a44',
+  orange: '#ee6a24',
+  cooked: '#c9a98a',   // 熟肉的颜色（原来用白粉笔表示「变白」）
 };
 const CK_TONES = ['pink', 'blue', 'yellow', 'green', 'orange'];   // 章节色轮换
 const CK_BORDERS = ['wave', 'dash', 'scallop', 'dot', 'zig', 'double'];
 const ckColor = k => CK[k] || k;
 
 // 黑板在屏幕上的位置（板面内区）。角色脚底 y=880 站在粉笔槽前；字幕在地板上 y≈930–1030。
-const CKB = { x: 70, y: 46, w: W - 140, h: 812 };
+// 板坐标：各段的内容画在 x 460–1450、y 40–890 这块「板」上（和黑板版的内容区一致）。
+// 屏幕上它缩成 CKV.s 倍，挂在箱庭厨房后墙正中（订单纸 x≈588–1340、y≈34–680），四周和下面露出厨房。
+const CKB = { x: 460, y: 40, w: 990, h: 850 };
 CKB.cx = CKB.x + CKB.w / 2; CKB.cy = CKB.y + CKB.h / 2;
+const CKV = { cx: 964, cy: 357, s: .76 };
+const CKT = { x: CKV.cx - CKB.w / 2 * CKV.s, y: CKV.cy - CKB.h / 2 * CKV.s, w: CKB.w * CKV.s, h: CKB.h * CKV.s };   // 订单纸（屏幕坐标）
 const CKCAM0 = { x: CKB.cx, y: CKB.cy, z: 1 };
 
-// ===================== 教室和黑板 =====================
-function ckRoom(c, t = 0) {
-  c.fillStyle = CK.wall; c.fillRect(0, 0, W, H);
-  grain(c, polyPath(rectPts(0, 0, W, H)), .05);
-  // 地板（木纹）
-  c.fillStyle = CK.floor; c.fillRect(0, 892, W, H - 892);
-  c.save(); c.strokeStyle = 'rgba(0,0,0,.28)'; c.lineWidth = 2;
-  for (let k = 0; k < 5; k++) { const y = 920 + k * 36; c.beginPath(); c.moveTo(0, y); c.lineTo(W, y + 4); c.stroke(); } c.restore();
-  // 黑板框（剪纸木框）+ 板面
-  const { x, y, w, h } = CKB;
-  cutPaper(c, rectPts(x - 26, y - 24, w + 52, h + 46, 6), CK.frame, { seed: 3101, step: 30, blur: 14, sy: 8, grain: .14 });
-  cutPaper(c, rectPts(x - 8, y - 6, w + 16, h + 12, 3), CK.frame2, { seed: 3102, step: 40, shadow: false, grain: .1 });
-  c.save(); c.fillStyle = CK.slate; c.fillRect(x, y, w, h);
-  const g = c.createRadialGradient(x + w * .45, y + h * .4, h * .2, x + w / 2, y + h / 2, w * .62);
-  g.addColorStop(0, alpha(CK.slate2, .9)); g.addColorStop(1, alpha('#0f1c16', .65)); c.fillStyle = g; c.fillRect(x, y, w, h);
-  // 擦过的粉笔灰（固定，不随时间变）
-  c.beginPath(); c.rect(x, y, w, h); c.clip();
-  c.globalAlpha = .035; c.strokeStyle = CK.ink; c.lineCap = 'round'; const r = rng(3103);
-  for (let k = 0; k < 9; k++) { c.lineWidth = 50 + r() * 70; const sx = x + r() * w, sy = y + 60 + r() * (h - 120); c.beginPath(); c.moveTo(sx, sy); c.bezierCurveTo(sx + 120, sy - 40, sx + 240, sy + 30, sx + 260 + r() * 200, sy + (r() - .5) * 60); c.stroke(); }
-  c.restore();
-  grain(c, polyPath(rectPts(x, y, w, h)), .07);
-  // 粉笔槽 + 几截粉笔 + 一块板擦
-  cutPaper(c, rectPts(x - 30, y + h + 14, w + 60, 22, 3), CK.frame, { seed: 3104, step: 30, blur: 8, sy: 5 });
-  for (const [px, col, len] of [[x + 1260, CK.ink, 46], [x + 1320, CK.yellow, 30], [x + 1360, CK.pink, 26], [x + 1400, CK.blue, 34]])
-    cutPaper(c, rectPts(px, y + h + 6, len, 11, 4), col, { seed: 3110 + px % 97, step: 8, blur: 3, sy: 2 });
-  ckEraser(c, x + 1520, y + h + 2, 0, .9);
-}
+// ===================== 舞台：箱庭厨房（src/lec/kitchen.js）+ 订单纸 =====================
+function ckRoom(c, t = 0) { ktRoom(c, t); ktTicket(c, t); }
 // 板坐标 → 屏幕坐标
-function ckToScreen(cam, x, y) { cam = cam || CKCAM0; return [CKB.cx + (x - cam.x) * cam.z, CKB.cy + (y - cam.y) * cam.z]; }
+function ckToScreen(cam, x, y) { cam = cam || CKCAM0; const k = cam.z * CKV.s; return [CKV.cx + (x - cam.x) * k, CKV.cy + (y - cam.y) * k]; }
 // ckCam：镜头关键帧。K = [[tau, x, y, z], ...]，返回 { x, y, z }
 function ckCam(tau, K) { const v = key(tau, K.map(k => [k[0], [k[1], k[2], k[3] ?? 1]])); return { x: v[0], y: v[1], z: v[2] }; }
 
@@ -82,12 +63,12 @@ function ckLayer(c, cam, fn, o = {}) {
   lc.setTransform(1, 0, 0, 1, 0, 0); lc.clearRect(0, 0, cw, ch);
   lc.globalAlpha = 1; lc.globalCompositeOperation = 'source-over'; lc.setLineDash([]); lc.shadowBlur = 0;
   // 当前变换（出片的 scale）× 镜头
-  lc.setTransform(m); lc.beginPath(); lc.rect(CKB.x, CKB.y, CKB.w, CKB.h); lc.clip();
-  lc.translate(CKB.cx, CKB.cy); lc.scale(cam.z, cam.z); lc.translate(-cam.x, -cam.y);
+  lc.setTransform(m); lc.beginPath(); lc.rect(CKT.x, CKT.y, CKT.w, CKT.h); lc.clip();
+  lc.translate(CKV.cx, CKV.cy); lc.scale(cam.z * CKV.s, cam.z * CKV.s); lc.translate(-cam.x, -cam.y);
   lc.save(); fn(lc); lc.restore();
   // 颗粒蒙版：在板坐标里铺，随镜头走
   if (o.grain !== false) {
-    lc.save(); lc.globalCompositeOperation = 'destination-out'; lc.globalAlpha = o.grainAl ?? .55;
+    lc.save(); lc.globalCompositeOperation = 'destination-out'; lc.globalAlpha = o.grainAl ?? .3;
     const pat = lc.createPattern(CK_GRAIN, 'repeat'); lc.fillStyle = pat;
     lc.fillRect(cam.x - CKB.w / cam.z, cam.y - CKB.h / cam.z, CKB.w * 2 / cam.z, CKB.h * 2 / cam.z); lc.restore();
   }
@@ -184,25 +165,28 @@ function ckErase(lc, rect, u) {
   return u < 1 ? (pos || [x + w, y + h - bh / 2]) : null;
 }
 // ckEraser：板擦（屏幕坐标）。rot 弧度，k 缩放
-function ckEraser(c, x, y, rot = 0, k = 1) {
-  c.save(); c.translate(x, y); c.rotate(rot); c.scale(k, k);
-  cutPaper(c, rectPts(-62, -22, 124, 26, 6), '#8a6446', { seed: 3130, step: 14, blur: 6, sy: 4 });
-  cutPaper(c, rectPts(-60, 2, 120, 16, 3), '#6f6a66', { seed: 3131, step: 12, shadow: false, grain: .3 });
+function ckEraser(c, x, y, rot = 0, k = 1) {   // 第 6 集：厨房海绵（黄海绵 + 绿色百洁布）
+  c.save(); c.translate(x, y); c.rotate(rot); c.scale(k * .9, k * .9);
+  cutPaper(c, rectPts(-58, -26, 116, 30, 10), '#ffd34d', { seed: 3130, step: 14, blur: 6, sy: 4 });
+  cutPaper(c, rectPts(-58, 2, 116, 16, 6), '#5cb85c', { seed: 3131, step: 12, shadow: false, grain: .3 });
+  c.fillStyle = alpha('#c99a1a', .5); for (let i = 0; i < 9; i++) { c.beginPath(); c.arc(-44 + i * 11, -14 + (i % 2) * 7, 2.6, 0, TAU); c.fill(); }
   c.restore();
 }
 
 // ===================== 粉笔头和粉尘 =====================
 // ckStick：一截粉笔（屏幕坐标），笔尖在 (x, y)。writing 为真时轻轻抖；color 是粉笔颜色键
-function ckStick(c, pos, tau, o = {}) {
+function ckStick(c, pos, tau, o = {}) {   // 第 6 集：马克笔（笔帽颜色 = 墨水颜色）
   if (!pos) return;
-  const { color = 'ink', writing = true, al = 1 } = o, [x, y] = pos, j = writing ? (hash(Math.floor(tau * 24), 3140) - .5) * 4 : 0;
-  c.save(); c.globalAlpha *= al; c.translate(x + j, y + j * .6); c.rotate(-.75);
-  cutPaper(c, rectPts(4, -9, 92, 18, 7), ckColor(color), { seed: 3141, step: 10, blur: 6, sx: 4, sy: 6 });
-  c.fillStyle = alpha('#000', .12); c.fillRect(60, -9, 36, 18);
+  const { color = 'ink', writing = true, al = 1 } = o, [x, y] = pos, j = writing ? (hash(Math.floor(tau * 24), 3140) - .5) * 3 : 0;
+  c.save(); c.globalAlpha *= al; c.translate(x + j, y + j * .6); c.rotate(-.8);
+  cutPaper(c, [[0, 0], [12, -6], [12, 6]], ckColor(color), { seed: 3142, step: 6, blur: 3, sy: 3 });
+  cutPaper(c, rectPts(12, -10, 70, 20, 5), '#fdfdfd', { seed: 3141, step: 10, blur: 6, sx: 4, sy: 6 });
+  cutPaper(c, rectPts(82, -11, 30, 22, 6), ckColor(color), { seed: 3143, step: 8, shadow: false });
   c.restore();
 }
 // ckDust：粉笔灰——从笔尖往下飘的小点。纯函数：每颗的出生时刻按 0.05 秒网格取，位置由 hash 决定
 function ckDust(c, pos, tau, writing, seed = 1) {
+  return;   // 第 6 集是马克笔，没有粉笔灰
   if (!pos) return; const [x, y] = pos;
   c.save(); c.fillStyle = CK.ink;
   for (let k = 0; k < 14; k++) {
